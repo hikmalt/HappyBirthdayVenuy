@@ -652,6 +652,9 @@
                 };
 
                 element.src = path;
+                if (isVideo) {
+                    element.muted = true;
+                }
             });
         }
 
@@ -692,6 +695,7 @@
         function skipCountdown() {
             clearInterval(countdownInterval);
             showConfetti();
+            playMainMusic();
         }
 
         const partyIcons = ['🎉', '🎂', '🥳', '🎈', '🎁'];
@@ -729,6 +733,10 @@
         let currentSlide = 0;
         let slideElements = [];
 
+        function playMainMusic() {
+            mainMusic.play().catch(e => console.log('Could not play audio:', e));
+        }
+
         function startSlideshow() {
             mediaFiles = [];
             for (let i = 1; i <= 36; i++) {
@@ -739,8 +747,6 @@
             }
             
             document.querySelector('.loading-message-container').style.display = 'none';
-
-            mainMusic.play().catch(e => console.log('Could not play audio:', e));
 
             if (mediaFiles.length === 0) {
                 setTimeout(() => {
@@ -759,7 +765,7 @@
                     element = document.createElement('video');
                     element.src = filePath;
                     element.autoplay = false;
-                    element.muted = false;
+                    element.muted = true;
                 } else {
                     element = document.createElement('img');
                     element.src = filePath;
@@ -875,9 +881,7 @@
             countdownInterval = setInterval(updateCountdown, 1000);
             
             document.addEventListener('click', () => {
-                if (!mainMusic.played.length) {
-                    mainMusic.play().catch(e => console.log('Could not play main music:', e));
-                }
+                playMainMusic();
             }, { once: true });
         });
 
