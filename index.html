@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy Birthday Venuy, Surprise!</title>
+    <title>Happy Birthday Surprise!</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
@@ -183,6 +183,17 @@
         .slide.active {
             opacity: 1;
             transform: scale(1);
+        }
+        
+        .loading-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+            font-size: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
 
         /* Birthday Message Section */
@@ -486,14 +497,6 @@
             50% { opacity: 1; transform: scale(1); }
             100% { opacity: 0; transform: scale(0); }
         }
-
-        .loading-message {
-            text-align: center;
-            color: white;
-            font-size: 1.5rem;
-            margin-top: 2rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
     </style>
 </head>
 <body>
@@ -518,13 +521,13 @@
 
     <section class="slideshow-section" id="slideshowSection">
         <div class="slide-container" id="slideContainer">
-            <div class="loading-message">Loading memories...</div>
+            <h1 class="loading-message">Loading memories...</h1>
         </div>
     </section>
 
     <section class="birthday-section" id="birthdaySection">
         <h1 class="birthday-message">Happy Birthday!</h1>
-        <p class="birthday-wish">Wishing you happiness for a long time! GBU 🎈</p>
+        <p class="birthday-wish">Wishing you happiness for a long time! 🎈</p>
     </section>
 
     <section class="cake-section" id="cakeSection">
@@ -550,11 +553,11 @@
     
     <div id="fullscreenPopup" class="fullscreen-popup">
         <span id="closeBtn" class="close-btn">&times;</span>
-        <img id="surpriseImage" src="https://images.stockfreeimages.com/1466/sfixl/14667289.jpg" alt="Surprise! Full Screen Image">
+        <img id="surpriseImage" src="media/surprise.jpg" alt="Surprise! Full Screen Image">
     </div>
 
     <section class="love-note-section" id="loveNoteSection">
-        <h1 class="love-note">I have a crush on you. Its Fine haha i just wanna confess</h1>
+        <h1 class="love-note">I have a crush on you.</h1>
         <div class="love-note-buttons">
             <button id="accept-btn">I Accept!</button>
             <button id="no-btn">No, Thanks!</button>
@@ -571,6 +574,47 @@
         // Initial audio setup
         mainMusic.volume = 0.5;
         
+        // Preload all media files
+        function preloadMedia(callback) {
+            const mediaPaths = [];
+            for (let i = 1; i <= 36; i++) {
+                mediaPaths.push(`media/${i}.jpg`);
+            }
+            for (let i = 1; i <= 19; i++) {
+                mediaPaths.push(`media/${i}.mp4`);
+            }
+            
+            let loadedCount = 0;
+            const totalFiles = mediaPaths.length;
+            
+            if (totalFiles === 0) {
+                callback();
+                return;
+            }
+
+            mediaPaths.forEach(path => {
+                const isVideo = path.includes('.mp4');
+                const element = isVideo ? new Video() : new Image();
+                
+                element.onload = () => {
+                    loadedCount++;
+                    if (loadedCount === totalFiles) {
+                        callback();
+                    }
+                };
+
+                element.onerror = () => {
+                    console.error(`Failed to load: ${path}`);
+                    loadedCount++;
+                    if (loadedCount === totalFiles) {
+                        callback();
+                    }
+                };
+                
+                element.src = path;
+            });
+        }
+
         // Sparkles effect
         function createSparkles() {
             const sparklesContainer = document.getElementById('sparkles');
@@ -639,7 +683,16 @@
             
             setTimeout(() => {
                 document.getElementById('throwbackSection').style.display = 'none';
-                startSlideshow();
+                
+                // Now, trigger the preloading and then the slideshow
+                const loadingMessage = document.querySelector('.loading-message');
+                loadingMessage.style.display = 'block';
+                document.getElementById('slideshowSection').style.display = 'flex';
+
+                preloadMedia(() => {
+                    loadingMessage.style.display = 'none';
+                    startSlideshow();
+                });
             }, 3000);
         }
 
@@ -656,8 +709,6 @@
             for (let i = 1; i <= 19; i++) {
                 mediaFiles.push(`media/${i}.mp4`);
             }
-
-            document.getElementById('slideshowSection').style.display = 'flex';
             
             mainMusic.play().catch(e => console.log('Could not play audio:', e));
 
@@ -793,9 +844,7 @@
             updateCountdown();
             countdownInterval = setInterval(updateCountdown, 1000);
             
-            // Add a single event listener to the document to handle the initial audio play
             document.addEventListener('click', () => {
-                // Check if audio has been played before to avoid re-playing
                 if (!countdownMusic.played.length) {
                     countdownMusic.play().catch(e => console.log('Could not play countdown music:', e));
                 }
