@@ -183,18 +183,41 @@
         .slide.active {
             opacity: 1;
             transform: scale(1);
+            filter: grayscale(0%);
         }
         
         .loading-message {
             position: absolute;
-            top: 50%;
+            top: 40%;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translateX(-50%);
             text-align: center;
             color: white;
             font-size: 2rem;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
+
+        .media-preload-bar {
+            width: 80%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .media-preload-bar .progress {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            margin-top: 10px;
+            font-size: 1.2rem;
+        }
+
 
         /* Birthday Message Section */
         .birthday-section {
@@ -500,7 +523,6 @@
     </style>
 </head>
 <body>
-    <audio id="countdownMusic" src="https://cdn.pixabay.com/audio/2025/05/21/audio_6c0ae4c250.mp3" loop></audio>
     <audio id="mainMusic" src="https://ia903103.us.archive.org/11/items/athousandyears_201911/A%20Thousand%20Years.mp3" loop></audio>
 
     <div class="sparkles" id="sparkles"></div>
@@ -520,8 +542,14 @@
     </section>
 
     <section class="slideshow-section" id="slideshowSection">
-        <div class="slide-container" id="slideContainer">
+        <div class="loading-message-container">
             <h1 class="loading-message">Loading memories...</h1>
+            <div class="media-preload-bar">
+                <div class="progress" id="progressBar"></div>
+            </div>
+            <p class="progress-text"><span id="progressText">0%</span></p>
+        </div>
+        <div class="slide-container" id="slideContainer">
         </div>
     </section>
 
@@ -566,15 +594,13 @@
 
 
     <script>
-        // Set up the music elements
-        const countdownMusic = document.getElementById('countdownMusic');
         const mainMusic = document.getElementById('mainMusic');
         const confettiContainer = document.getElementById('confettiContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
 
-        // Initial audio setup
         mainMusic.volume = 0.5;
         
-        // Preload all media files
         function preloadMedia(callback) {
             const mediaPaths = [];
             for (let i = 1; i <= 36; i++) {
@@ -594,28 +620,31 @@
 
             mediaPaths.forEach(path => {
                 const isVideo = path.includes('.mp4');
-                const element = isVideo ? new Video() : new Image();
+                const element = isVideo ? document.createElement('video') : new Image();
                 
-                element.onload = () => {
+                function onLoaded() {
                     loadedCount++;
+                    const percentage = Math.floor((loadedCount / totalFiles) * 100);
+                    progressBar.style.width = percentage + '%';
+                    progressText.textContent = percentage + '%';
+                    
                     if (loadedCount === totalFiles) {
                         callback();
                     }
-                };
+                }
+                
+                element.onload = onLoaded;
+                element.oncanplaythrough = onLoaded; // For videos
 
                 element.onerror = () => {
                     console.error(`Failed to load: ${path}`);
-                    loadedCount++;
-                    if (loadedCount === totalFiles) {
-                        callback();
-                    }
+                    onLoaded(); // Still count it as "loaded" to not block the slideshow
                 };
-                
+
                 element.src = path;
             });
         }
 
-        // Sparkles effect
         function createSparkles() {
             const sparklesContainer = document.getElementById('sparkles');
             for (let i = 0; i < 50; i++) {
@@ -628,7 +657,6 @@
             }
         }
 
-        // Countdown functionality
         const countDownDate = new Date("Aug 8, 2025 00:00:00").getTime();
         let countdownInterval;
 
@@ -653,12 +681,9 @@
 
         function skipCountdown() {
             clearInterval(countdownInterval);
-            countdownMusic.pause();
-            countdownMusic.currentTime = 0;
             showConfetti();
         }
 
-        // Confetti effect
         const partyIcons = ['🎉', '🎂', '🥳', '🎈', '🎁'];
         function showConfetti() {
             document.getElementById('countdownSection').style.display = 'none';
@@ -684,19 +709,12 @@
             setTimeout(() => {
                 document.getElementById('throwbackSection').style.display = 'none';
                 
-                // Now, trigger the preloading and then the slideshow
-                const loadingMessage = document.querySelector('.loading-message');
-                loadingMessage.style.display = 'block';
                 document.getElementById('slideshowSection').style.display = 'flex';
 
-                preloadMedia(() => {
-                    loadingMessage.style.display = 'none';
-                    startSlideshow();
-                });
+                preloadMedia(startSlideshow);
             }, 3000);
         }
 
-        // Slideshow functionality
         let mediaFiles = [];
         let currentSlide = 0;
         let slideElements = [];
@@ -710,6 +728,10 @@
                 mediaFiles.push(`media/${i}.mp4`);
             }
             
+            document.querySelector('.loading-message-container').style.display = 'none';
+
+            // Set the start time of the music to 30 seconds
+            mainMusic.currentTime = 30;
             mainMusic.play().catch(e => console.log('Could not play audio:', e));
 
             if (mediaFiles.length === 0) {
@@ -722,7 +744,7 @@
             const slideContainer = document.getElementById('slideContainer');
             slideContainer.innerHTML = '';
 
-            mediaFiles.forEach((filePath, index) => {
+            mediaFiles.forEach((filePath) => {
                 const isVideo = filePath.includes('.mp4');
                 let element;
                 if (isVideo) {
@@ -845,8 +867,8 @@
             countdownInterval = setInterval(updateCountdown, 1000);
             
             document.addEventListener('click', () => {
-                if (!countdownMusic.played.length) {
-                    countdownMusic.play().catch(e => console.log('Could not play countdown music:', e));
+                if (!mainMusic.played.length) {
+                    mainMusic.play().catch(e => console.log('Could not play main music:', e));
                 }
             }, { once: true });
         });
