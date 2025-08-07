@@ -153,6 +153,7 @@
         .slideshow-section {
             height: 100vh;
             display: none;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             position: relative;
@@ -186,23 +187,32 @@
             filter: grayscale(0%);
         }
         
-        .loading-message {
+        .loading-message-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             position: absolute;
-            top: 40%;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .loading-message {
             text-align: center;
             color: white;
             font-size: 2rem;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
         }
 
         .media-preload-bar {
-            width: 80%;
+            width: 100%;
             height: 20px;
             background: rgba(255, 255, 255, 0.2);
             border-radius: 10px;
-            margin-top: 20px;
             overflow: hidden;
         }
 
@@ -634,11 +644,11 @@
                 }
                 
                 element.onload = onLoaded;
-                element.oncanplaythrough = onLoaded; // For videos
+                element.oncanplaythrough = onLoaded; 
 
                 element.onerror = () => {
                     console.error(`Failed to load: ${path}`);
-                    onLoaded(); // Still count it as "loaded" to not block the slideshow
+                    onLoaded(); 
                 };
 
                 element.src = path;
@@ -730,8 +740,6 @@
             
             document.querySelector('.loading-message-container').style.display = 'none';
 
-            // Set the start time of the music to 30 seconds
-            mainMusic.currentTime = 30;
             mainMusic.play().catch(e => console.log('Could not play audio:', e));
 
             if (mediaFiles.length === 0) {
