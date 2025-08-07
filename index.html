@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* General Styles */
         * {
             margin: 0;
             padding: 0;
@@ -30,13 +31,11 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Responsive adjustments */
+        /* Responsive adjustments for smaller screens */
         @media (max-width: 768px) {
-            .countdown-title { font-size: 2rem; }
-            .countdown-timer { font-size: 3rem; }
+            .throwback-text { font-size: 3rem; }
             .birthday-message { font-size: 3rem; }
             .birthday-wish { font-size: 1.5rem; }
-            .slide { width: 95vw; height: 75vh; }
             .cake { transform: scale(0.7); }
             .present-box { transform: scale(0.8); }
         }
@@ -64,30 +63,6 @@
             20% { opacity: 1; transform: scale(1); }
             80% { opacity: 1; transform: scale(1.1); }
             100% { opacity: 0; transform: scale(1.2); }
-        }
-
-        /* Confetti Section */
-        .confetti-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            overflow: hidden;
-            z-index: 10;
-        }
-
-        .confetti {
-            position: absolute;
-            animation: confetti-fall 5s ease-out forwards;
-            font-size: 2rem;
-            opacity: 0;
-        }
-
-        @keyframes confetti-fall {
-            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
         }
 
         /* Slideshow Section */
@@ -119,55 +94,14 @@
             opacity: 0;
             transform: scale(0.8);
             transition: all 0.5s ease;
+            filter: grayscale(100%); /* Default black and white filter */
         }
 
         .slide.active {
             opacity: 1;
             transform: scale(1);
-            filter: grayscale(0%);
+            filter: grayscale(0%); /* Remove filter for active slide */
         }
-        
-        .loading-message-container {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80%;
-            max-width: 500px;
-        }
-
-        .loading-message {
-            text-align: center;
-            color: white;
-            font-size: 2rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            margin-bottom: 20px;
-        }
-
-        .media-preload-bar {
-            width: 100%;
-            height: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .media-preload-bar .progress {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
-            transition: width 0.3s ease;
-        }
-        
-        .progress-text {
-            margin-top: 10px;
-            font-size: 1.2rem;
-        }
-
 
         /* Birthday Message Section */
         .birthday-section {
@@ -448,6 +382,7 @@
             display: none;
         }
 
+        /* Sparkles Effect */
         .sparkles {
             position: absolute;
             width: 100%;
@@ -476,8 +411,6 @@
     <audio id="mainMusic" src="https://ia903103.us.archive.org/11/items/athousandyears_201911/A%20Thousand%20Years.mp3" loop></audio>
 
     <div class="sparkles" id="sparkles"></div>
-    
-    <div id="confettiContainer" class="confetti-container"></div>
     
     <section class="throwback-section" id="throwbackSection">
         <h1 class="throwback-text">Throwback Memories</h1>
@@ -529,10 +462,13 @@
 
 
     <script>
+        // Get the audio element
         const mainMusic = document.getElementById('mainMusic');
         
+        // Set music volume
         mainMusic.volume = 0.5;
 
+        // Function to create a sparkling effect
         function createSparkles() {
             const sparklesContainer = document.getElementById('sparkles');
             for (let i = 0; i < 50; i++) {
@@ -549,11 +485,9 @@
         let currentSlide = 0;
         let slideElements = [];
 
-        function playMainMusic() {
-            mainMusic.play().catch(e => console.log('Could not play audio:', e));
-        }
-
+        // Function to start the slideshow sequence
         function startSlideshow() {
+            // Define the media files to be used in the slideshow
             mediaFiles = [];
             for (let i = 1; i <= 36; i++) {
                 mediaFiles.push(`media/${i}.jpg`);
@@ -562,9 +496,11 @@
                 mediaFiles.push(`media/${i}.mp4`);
             }
             
+            // Hide the throwback section and show the slideshow
             document.getElementById('throwbackSection').style.display = 'none';
             document.getElementById('slideshowSection').style.display = 'flex';
             
+            // If there are no media files, skip to the birthday message
             if (mediaFiles.length === 0) {
                 setTimeout(() => {
                     showBirthdayMessage();
@@ -572,6 +508,7 @@
                 return;
             }
             
+            // Clear the slide container and create new elements
             const slideContainer = document.getElementById('slideContainer');
             slideContainer.innerHTML = '';
 
@@ -589,31 +526,31 @@
                     element.src = filePath;
                 }
                 
-                element.style.filter = 'grayscale(100%)';
-
+                // Add the black and white filter to all slides initially
                 element.classList.add('slide');
                 slideContainer.appendChild(element);
                 slideElements.push(element);
             });
             
+            // Start the slideshow with the first slide
             showNextSlide();
         }
 
+        // Function to show the next slide in the sequence
         function showNextSlide() {
             if (currentSlide >= slideElements.length) {
                 showBirthdayMessage();
                 return;
             }
 
+            // Remove the active class from the previous slide
             if (currentSlide > 0) {
-                slideElements[currentSlide - 1].style.filter = 'grayscale(100%)';
                 slideElements[currentSlide - 1].classList.remove('active');
             }
 
+            // Get the current slide and make it active
             const currentElement = slideElements[currentSlide];
             currentElement.classList.add('active');
-
-            currentElement.style.filter = 'grayscale(0%)';
 
             const isVideo = currentElement.tagName === 'VIDEO';
             const duration = isVideo ? 4000 : 2000; 
@@ -633,6 +570,7 @@
             }
         }
 
+        // Function to show the birthday message
         function showBirthdayMessage() {
             document.getElementById('slideshowSection').style.display = 'none';
             document.getElementById('birthdaySection').style.display = 'flex';
@@ -642,6 +580,7 @@
             }, 5000);
         }
 
+        // Function to show the cake
         function showCake() {
             document.getElementById('birthdaySection').style.display = 'none';
             document.getElementById('cakeSection').style.display = 'flex';
@@ -651,6 +590,7 @@
             }, 3000);
         }
 
+        // Function to blow out the candle animation
         function blowOutCandle() {
             const flame = document.getElementById('flame');
             flame.classList.add('blown-out');
@@ -660,6 +600,7 @@
             }, 2000);
         }
 
+        // Function to show the present
         function showPresent() {
             document.getElementById('cakeSection').style.display = 'none';
             document.getElementById('presentSection').style.display = 'flex';
@@ -667,6 +608,7 @@
             document.getElementById('presentBox').onclick = openPresent;
         }
 
+        // Function to open the present and show a pop-up
         function openPresent() {
             const popup = document.getElementById('fullscreenPopup');
             popup.style.display = 'flex';
@@ -675,12 +617,14 @@
             audio.play().catch(e => console.log('Could not play audio:', e));
         }
 
+        // Close button for the pop-up
         document.getElementById('closeBtn').onclick = () => {
             const popup = document.getElementById('fullscreenPopup');
             popup.style.display = 'none';
             showLoveNote();
         };
 
+        // Show the final love note section
         function showLoveNote() {
             document.getElementById('presentSection').style.display = 'none';
             document.getElementById('loveNoteSection').style.display = 'flex';
@@ -688,31 +632,38 @@
             document.getElementById('loveNoteSection').scrollIntoView({ behavior: 'smooth' });
         }
 
+        // Handle the "I Accept" button for the love note
         document.getElementById('accept-btn').onclick = () => {
             const phoneNumber = '62895629471997';
             const message = encodeURIComponent('I accept your confession! 😉');
             window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
         };
 
+        // Handle the "No, Thanks" button for the love note
         document.getElementById('no-btn').onclick = () => {
             document.getElementById('loveNoteSection').style.display = 'none';
             alert('Oh. Okay, no problem!');
         };
 
 
-        // Initialize
+        // Main initialization on page load
         document.addEventListener('DOMContentLoaded', function() {
             createSparkles();
             
-            // This attempts to auto-play the music
+            // Attempt to auto-play the music. Most browsers will block this.
             mainMusic.play().catch(e => {
-                console.log('Autoplay blocked.');
+                console.log('Autoplay blocked. Adding an event listener for first user interaction.');
+                // Fallback: play music on the first user interaction
+                document.addEventListener('click', () => {
+                    mainMusic.play().catch(err => console.error('Failed to play audio after user interaction:', err));
+                }, { once: true });
             });
             
-            // Start the process
+            // Start the main sequence
             showThrowbackText();
         });
 
+        // Function to show the "Throwback Memories" text initially
         function showThrowbackText() {
             document.getElementById('throwbackSection').style.display = 'flex';
             
@@ -722,6 +673,7 @@
             }, 3000);
         }
 
+        // Add a CSS keyframe for the present box animation
         const style = document.createElement('style');
         style.textContent = `
             @keyframes presentOpen {
