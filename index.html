@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Venuy, Surprise!</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(45deg, #0f0c29, #3a384f, #1e1b32);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            color: #f0f0f0;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .countdown-title { font-size: 2rem; }
+            .countdown-timer { font-size: 3rem; }
+            .birthday-message { font-size: 3rem; }
+            .birthday-wish { font-size: 1.5rem; }
+            .slide { width: 95vw; height: 75vh; }
+            .cake { transform: scale(0.7); }
+            .present-box { transform: scale(0.8); }
+        }
+        
+        /* Throwback Text Section */
+        .throwback-section {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .throwback-text {
+            font-family: 'Brush Script MT', cursive;
+            font-size: 5rem;
+            opacity: 0;
+            animation: fadeInOut 3s ease-in-out forwards;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: scale(0.8); }
+            20% { opacity: 1; transform: scale(1); }
+            80% { opacity: 1; transform: scale(1.1); }
+            100% { opacity: 0; transform: scale(1.2); }
+        }
+
+        /* Confetti Section */
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .confetti {
+            position: absolute;
+            animation: confetti-fall 5s ease-out forwards;
+            font-size: 2rem;
+            opacity: 0;
+        }
+
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* Slideshow Section */
+        .slideshow-section {
+            height: 100vh;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .slide-container {
+            position: relative;
+            width: 80vw;
+            height: 80vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.5s ease;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: scale(1);
+            filter: grayscale(0%);
+        }
+        
+        .loading-message-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .loading-message {
+            text-align: center;
+            color: white;
+            font-size: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+        }
+
+        .media-preload-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .media-preload-bar .progress {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            margin-top: 10px;
+            font-size: 1.2rem;
+        }
+
+
+        /* Birthday Message Section */
+        .birthday-section {
+            height: 100vh;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 2rem;
+        }
+
+        .birthday-message {
+            font-size: 4rem;
+            margin-bottom: 2rem;
+            animation: bounceIn 2s ease;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0); opacity: 0; }
+            60% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+
+        .birthday-wish {
+            font-size: 2rem;
+            animation: slideInUp 2s ease 1s both;
+        }
+
+        @keyframes slideInUp {
+            0% { transform: translateY(100px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Cake Section */
+        .cake-section {
+            height: 100vh;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .cake {
+            position: relative;
+            width: 300px;
+            height: 400px;
+            animation: cakeAppear 2s ease;
+        }
+
+        @keyframes cakeAppear {
+            0% { transform: translateY(100px) scale(0); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .cake-base {
+            width: 280px;
+            height: 180px;
+            background: linear-gradient(45deg, #8B4513, #D2691E);
+            border-radius: 20px;
+            position: absolute;
+            bottom: 0;
+            left: 10px;
+        }
+
+        .cake-layer1 {
+            width: 240px;
+            height: 120px;
+            background: linear-gradient(45deg, #FFB6C1, #FF69B4);
+            border-radius: 15px;
+            position: absolute;
+            bottom: 180px;
+            left: 30px;
+        }
+
+        .cake-layer2 {
+            width: 200px;
+            height: 80px;
+            background: linear-gradient(45deg, #98FB98, #32CD32);
+            border-radius: 10px;
+            position: absolute;
+            bottom: 300px;
+            left: 50px;
+        }
+
+        .candle {
+            width: 8px;
+            height: 40px;
+            background: #FFD700;
+            position: absolute;
+            bottom: 380px;
+            left: 146px;
+            border-radius: 4px;
+        }
+
+        .flame {
+            width: 12px;
+            height: 15px;
+            background: radial-gradient(circle, #FF4500, #FFD700);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            position: absolute;
+            top: -15px;
+            left: -2px;
+            animation: flicker 0.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% { transform: scale(1) rotate(-1deg); }
+            100% { transform: scale(1.1) rotate(1deg); }
+        }
+
+        .flame.blown-out {
+            animation: blowOut 1s ease forwards;
+        }
+
+        @keyframes blowOut {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0); }
+        }
+
+        /* Present Section */
+        .present-section {
+            height: 100vh;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .present-box {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            animation: presentAppear 2s ease;
+            cursor: pointer;
+        }
+
+        @keyframes presentAppear {
+            0% { transform: scale(0) rotate(180deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .box {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .ribbon-h {
+            width: 200px;
+            height: 20px;
+            background: #FFD700;
+            position: absolute;
+            top: 90px;
+            left: 0;
+        }
+
+        .ribbon-v {
+            width: 20px;
+            height: 200px;
+            background: #FFD700;
+            position: absolute;
+            top: 0;
+            left: 90px;
+        }
+
+        .bow {
+            width: 40px;
+            height: 40px;
+            background: #FF1493;
+            border-radius: 50%;
+            position: absolute;
+            top: -20px;
+            left: 80px;
+            animation: bowBounce 2s ease infinite;
+        }
+
+        @keyframes bowBounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Full-screen pop-up for the surprise image */
+        .fullscreen-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .fullscreen-popup.show {
+            display: flex;
+        }
+
+        .fullscreen-popup img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 2rem;
+            color: white;
+            cursor: pointer;
+            z-index: 101;
+            font-weight: bold;
+        }
+
+        /* Love Note Section */
+        .love-note-section {
+            height: 100vh;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .love-note {
+            font-family: 'Dancing Script', cursive;
+            font-size: 5rem;
+            color: #ff6b6b;
+            margin-bottom: 2rem;
+            animation: loveNoteAppear 2s ease forwards;
+            opacity: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: 2px;
+        }
+        
+        @keyframes loveNoteAppear {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .love-note-buttons {
+            display: flex;
+            gap: 50px;
+            margin-top: 2rem;
+            justify-content: center;
+        }
+        
+        .love-note-buttons button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .love-note-buttons button:hover {
+            transform: scale(1.1);
+        }
+        
+        #accept-btn {
+            background-color: #28a745;
+        }
+        
+        #no-btn {
+            background-color: #dc3545;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .sparkles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            animation: sparkle 2s linear infinite;
+        }
+
+        @keyframes sparkle {
+            0% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0); }
+        }
+    </style>
+</head>
+<body>
+    <audio id="mainMusic" src="https://ia903103.us.archive.org/11/items/athousandyears_201911/A%20Thousand%20Years.mp3" loop></audio>
+
+    <div class="sparkles" id="sparkles"></div>
+    
+    <div id="confettiContainer" class="confetti-container"></div>
+    
+    <section class="throwback-section" id="throwbackSection">
+        <h1 class="throwback-text">Throwback Memories</h1>
+    </section>
+
+    <section class="slideshow-section" id="slideshowSection">
+        <div class="slide-container" id="slideContainer">
+        </div>
+    </section>
+
+    <section class="birthday-section" id="birthdaySection">
+        <h1 class="birthday-message">Happy Birthday Venuy!</h1>
+        <p class="birthday-wish">Wishing you happiness for a long time! Gbu🎈</p>
+    </section>
+
+    <section class="cake-section" id="cakeSection">
+        <div class="cake">
+            <div class="cake-base"></div>
+            <div class="cake-layer1"></div>
+            <div class="cake-layer2"></div>
+            <div class="candle">
+                <div class="flame" id="flame"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="present-section" id="presentSection">
+        <div class="present-box" onclick="openPresent()">
+            <div class="box" id="presentBox">
+                <div class="ribbon-h"></div>
+                <div class="ribbon-v"></div>
+                <div class="bow"></div>
+            </div>
+        </div>
+    </section>
+    
+    <div id="fullscreenPopup" class="fullscreen-popup">
+        <span id="closeBtn" class="close-btn">&times;</span>
+        <img id="surpriseImage" src="https://thumbs.dreamstime.com/b/kind-senior-gentleman-giving-flowers-to-someone-looking-camera-isolated-white-background-52183546.jpg" alt="Surprise! For youuu">
+    </div>
+
+    <section class="love-note-section" id="loveNoteSection">
+        <h1 class="love-note">I have a crush on you. haha i just wanna confess</h1>
+        <div class="love-note-buttons">
+            <button id="accept-btn">I Accept!</button>
+            <button id="no-btn">No, Thanks!</button>
+        </div>
+    </section>
+
+
+    <script>
+        const mainMusic = document.getElementById('mainMusic');
+        
+        mainMusic.volume = 0.5;
+
+        function createSparkles() {
+            const sparklesContainer = document.getElementById('sparkles');
+            for (let i = 0; i < 50; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = Math.random() * 100 + '%';
+                sparkle.style.top = Math.random() * 100 + '%';
+                sparkle.style.animationDelay = Math.random() * 2 + 's';
+                sparklesContainer.appendChild(sparkle);
+            }
+        }
+        
+        let mediaFiles = [];
+        let currentSlide = 0;
+        let slideElements = [];
+
+        function playMainMusic() {
+            mainMusic.play().catch(e => console.log('Could not play audio:', e));
+        }
+
+        function startSlideshow() {
+            mediaFiles = [];
+            for (let i = 1; i <= 36; i++) {
+                mediaFiles.push(`media/${i}.jpg`);
+            }
+            for (let i = 1; i <= 19; i++) {
+                mediaFiles.push(`media/${i}.mp4`);
+            }
+            
+            document.getElementById('throwbackSection').style.display = 'none';
+            document.getElementById('slideshowSection').style.display = 'flex';
+            
+            if (mediaFiles.length === 0) {
+                setTimeout(() => {
+                    showBirthdayMessage();
+                }, 2000);
+                return;
+            }
+            
+            const slideContainer = document.getElementById('slideContainer');
+            slideContainer.innerHTML = '';
+
+            mediaFiles.forEach((filePath) => {
+                const isVideo = filePath.includes('.mp4');
+                let element;
+                if (isVideo) {
+                    element = document.createElement('video');
+                    element.src = filePath;
+                    element.autoplay = false;
+                    element.muted = true;
+                    element.preload = 'auto';
+                } else {
+                    element = document.createElement('img');
+                    element.src = filePath;
+                }
+                
+                // Apply the black and white filter directly
+                element.style.filter = 'grayscale(100%)';
+
+                element.classList.add('slide');
+                slideContainer.appendChild(element);
+                slideElements.push(element);
+            });
+            
+            showNextSlide();
+        }
+
+        function showNextSlide() {
+            if (currentSlide >= slideElements.length) {
+                showBirthdayMessage();
+                return;
+            }
+
+            if (currentSlide > 0) {
+                // Keep the filter on the previous slide
+                slideElements[currentSlide - 1].classList.remove('active');
+            }
+
+            const currentElement = slideElements[currentSlide];
+            currentElement.classList.add('active');
+
+            // Remove the grayscale filter to show color
+            currentElement.style.filter = 'grayscale(0%)';
+
+            const isVideo = currentElement.tagName === 'VIDEO';
+            const duration = isVideo ? 4000 : 2000; 
+            
+            if (isVideo) {
+                currentElement.play();
+                setTimeout(() => {
+                    currentElement.pause();
+                    currentSlide++;
+                    showNextSlide();
+                }, duration);
+            } else {
+                setTimeout(() => {
+                    currentSlide++;
+                    showNextSlide();
+                }, duration);
+            }
+        }
+
+        function showBirthdayMessage() {
+            document.getElementById('slideshowSection').style.display = 'none';
+            document.getElementById('birthdaySection').style.display = 'flex';
+            
+            setTimeout(() => {
+                showCake();
+            }, 5000);
+        }
+
+        function showCake() {
+            document.getElementById('birthdaySection').style.display = 'none';
+            document.getElementById('cakeSection').style.display = 'flex';
+            
+            setTimeout(() => {
+                blowOutCandle();
+            }, 3000);
+        }
+
+        function blowOutCandle() {
+            const flame = document.getElementById('flame');
+            flame.classList.add('blown-out');
+            
+            setTimeout(() => {
+                showPresent();
+            }, 2000);
+        }
+
+        function showPresent() {
+            document.getElementById('cakeSection').style.display = 'none';
+            document.getElementById('presentSection').style.display = 'flex';
+            
+            document.getElementById('presentBox').onclick = openPresent;
+        }
+
+        function openPresent() {
+            const popup = document.getElementById('fullscreenPopup');
+            popup.style.display = 'flex';
+            
+            const audio = new Audio('https://www.soundjay.com/misc/sounds/tada.wav');
+            audio.play().catch(e => console.log('Could not play audio:', e));
+        }
+
+        document.getElementById('closeBtn').onclick = () => {
+            const popup = document.getElementById('fullscreenPopup');
+            popup.style.display = 'none';
+            showLoveNote();
+        };
+
+        function showLoveNote() {
+            document.getElementById('presentSection').style.display = 'none';
+            document.getElementById('loveNoteSection').style.display = 'flex';
+
+            document.getElementById('loveNoteSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        document.getElementById('accept-btn').onclick = () => {
+            const phoneNumber = '62895629471997';
+            const message = encodeURIComponent('I accept your confession! 😉');
+            window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+        };
+
+        document.getElementById('no-btn').onclick = () => {
+            document.getElementById('loveNoteSection').style.display = 'none';
+            alert('Oh. Okay, no problem!');
+        };
+
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            createSparkles();
+            
+            // This attempts to auto-play the music
+            mainMusic.play().catch(e => {
+                console.log('Autoplay blocked. Waiting for user interaction.');
+                
+                // On first interaction (any click), play the music
+                document.addEventListener('click', () => {
+                    mainMusic.play().catch(err => console.error('Failed to play audio after user interaction:', err));
+                }, { once: true });
+            });
+            
+            // Start the process
+            showThrowbackText();
+        });
+
+        function showThrowbackText() {
+            document.getElementById('throwbackSection').style.display = 'flex';
+            
+            setTimeout(() => {
+                document.getElementById('throwbackSection').style.display = 'none';
+                startSlideshow();
+            }, 3000);
+        }
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes presentOpen {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.1) rotateY(180deg); }
+                100% { transform: scale(1.2) rotateY(360deg); opacity: 0.7; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
