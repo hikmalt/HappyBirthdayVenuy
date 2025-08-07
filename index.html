@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy Birthday Venuy, Surprise!</title>
+    <title>Happy Birthday Surprise!</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
@@ -489,8 +489,8 @@
     </section>
 
     <section class="birthday-section" id="birthdaySection">
-        <h1 class="birthday-message">Happy Birthday Venuy!</h1>
-        <p class="birthday-wish">Wishing you happiness for a long time! Gbu🎈</p>
+        <h1 class="birthday-message">Happy Birthday!</h1>
+        <p class="birthday-wish">Wishing you happiness for a long time! 🎈</p>
     </section>
 
     <section class="cake-section" id="cakeSection">
@@ -516,11 +516,11 @@
     
     <div id="fullscreenPopup" class="fullscreen-popup">
         <span id="closeBtn" class="close-btn">&times;</span>
-        <img id="surpriseImage" src="https://thumbs.dreamstime.com/b/kind-senior-gentleman-giving-flowers-to-someone-looking-camera-isolated-white-background-52183546.jpg" alt="Surprise! For youuu">
+        <img id="surpriseImage" src="media/surprise.jpg" alt="Surprise! Full Screen Image">
     </div>
 
     <section class="love-note-section" id="loveNoteSection">
-        <h1 class="love-note">I have a crush on you. haha i just wanna confess</h1>
+        <h1 class="love-note">I have a crush on you.</h1>
         <div class="love-note-buttons">
             <button id="accept-btn">I Accept!</button>
             <button id="no-btn">No, Thanks!</button>
@@ -589,7 +589,6 @@
                     element.src = filePath;
                 }
                 
-                // Apply the black and white filter directly
                 element.style.filter = 'grayscale(100%)';
 
                 element.classList.add('slide');
@@ -607,14 +606,13 @@
             }
 
             if (currentSlide > 0) {
-                // Keep the filter on the previous slide
+                slideElements[currentSlide - 1].style.filter = 'grayscale(100%)';
                 slideElements[currentSlide - 1].classList.remove('active');
             }
 
             const currentElement = slideElements[currentSlide];
             currentElement.classList.add('active');
 
-            // Remove the grayscale filter to show color
             currentElement.style.filter = 'grayscale(0%)';
 
             const isVideo = currentElement.tagName === 'VIDEO';
@@ -708,12 +706,7 @@
             
             // This attempts to auto-play the music
             mainMusic.play().catch(e => {
-                console.log('Autoplay blocked. Waiting for user interaction.');
-                
-                // On first interaction (any click), play the music
-                document.addEventListener('click', () => {
-                    mainMusic.play().catch(err => console.error('Failed to play audio after user interaction:', err));
-                }, { once: true });
+                console.log('Autoplay blocked.');
             });
             
             // Start the process
