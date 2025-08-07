@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Happy Birthday Surprise!</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -153,7 +150,6 @@
         .slideshow-section {
             height: 100vh;
             display: none;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             position: relative;
@@ -184,50 +180,7 @@
         .slide.active {
             opacity: 1;
             transform: scale(1);
-            filter: grayscale(0%);
         }
-        
-        .loading-message-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80%;
-            max-width: 500px;
-        }
-
-        .loading-message {
-            text-align: center;
-            color: white;
-            font-size: 2rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            margin-bottom: 20px;
-        }
-
-        .media-preload-bar {
-            width: 100%;
-            height: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .media-preload-bar .progress {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
-            transition: width 0.3s ease;
-        }
-        
-        .progress-text {
-            margin-top: 10px;
-            font-size: 1.2rem;
-        }
-
 
         /* Birthday Message Section */
         .birthday-section {
@@ -421,7 +374,7 @@
             width: 100vw;
             height: 100vh;
             background-color: rgba(0, 0, 0, 0.9);
-            display: none;
+            display: none; /* Changed to none */
             justify-content: center;
             align-items: center;
             z-index: 100;
@@ -460,14 +413,13 @@
         }
 
         .love-note {
-            font-family: 'Dancing Script', cursive;
+            font-family: 'Brush Script MT', cursive;
             font-size: 5rem;
             color: #ff6b6b;
             margin-bottom: 2rem;
             animation: loveNoteAppear 2s ease forwards;
             opacity: 0;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            letter-spacing: 2px;
         }
         
         @keyframes loveNoteAppear {
@@ -477,9 +429,8 @@
         
         .love-note-buttons {
             display: flex;
-            gap: 50px;
+            gap: 20px;
             margin-top: 2rem;
-            justify-content: center;
         }
         
         .love-note-buttons button {
@@ -530,10 +481,19 @@
             50% { opacity: 1; transform: scale(1); }
             100% { opacity: 0; transform: scale(0); }
         }
+
+        .loading-message {
+            text-align: center;
+            color: white;
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
     </style>
 </head>
 <body>
-    <audio id="mainMusic" src="https://ia903103.us.archive.org/11/items/athousandyears_201911/A%20Thousand%20Years.mp3" loop></audio>
+    <audio id="countdownMusic" src="https://www.soundjay.com/misc/sounds/ticking-clock-1.mp3" loop></audio>
+    <audio id="mainMusic" src="https://www.soundjay.com/misc/sounds/happy-birthday-to-you-1.mp3" loop></audio>
 
     <div class="sparkles" id="sparkles"></div>
     
@@ -552,14 +512,8 @@
     </section>
 
     <section class="slideshow-section" id="slideshowSection">
-        <div class="loading-message-container">
-            <h1 class="loading-message">Loading memories...</h1>
-            <div class="media-preload-bar">
-                <div class="progress" id="progressBar"></div>
-            </div>
-            <p class="progress-text"><span id="progressText">0%</span></p>
-        </div>
         <div class="slide-container" id="slideContainer">
+            <div class="loading-message">Loading memories...</div>
         </div>
     </section>
 
@@ -604,60 +558,15 @@
 
 
     <script>
+        // Set up the music elements
+        const countdownMusic = document.getElementById('countdownMusic');
         const mainMusic = document.getElementById('mainMusic');
         const confettiContainer = document.getElementById('confettiContainer');
-        const progressBar = document.getElementById('progressBar');
-        const progressText = document.getElementById('progressText');
 
-        mainMusic.volume = 0.5;
+        // Initial audio setup
+        mainMusic.volume = 0.5; // Set background music to a lower volume
         
-        function preloadMedia(callback) {
-            const mediaPaths = [];
-            for (let i = 1; i <= 36; i++) {
-                mediaPaths.push(`media/${i}.jpg`);
-            }
-            for (let i = 1; i <= 19; i++) {
-                mediaPaths.push(`media/${i}.mp4`);
-            }
-            
-            let loadedCount = 0;
-            const totalFiles = mediaPaths.length;
-            
-            if (totalFiles === 0) {
-                callback();
-                return;
-            }
-
-            mediaPaths.forEach(path => {
-                const isVideo = path.includes('.mp4');
-                const element = isVideo ? document.createElement('video') : new Image();
-                
-                function onLoaded() {
-                    loadedCount++;
-                    const percentage = Math.floor((loadedCount / totalFiles) * 100);
-                    progressBar.style.width = percentage + '%';
-                    progressText.textContent = percentage + '%';
-                    
-                    if (loadedCount === totalFiles) {
-                        callback();
-                    }
-                }
-                
-                element.onload = onLoaded;
-                element.oncanplaythrough = onLoaded; 
-
-                element.onerror = () => {
-                    console.error(`Failed to load: ${path}`);
-                    onLoaded(); 
-                };
-
-                element.src = path;
-                if (isVideo) {
-                    element.muted = true;
-                }
-            });
-        }
-
+        // Sparkles effect
         function createSparkles() {
             const sparklesContainer = document.getElementById('sparkles');
             for (let i = 0; i < 50; i++) {
@@ -670,6 +579,7 @@
             }
         }
 
+        // Countdown functionality
         const countDownDate = new Date("Aug 8, 2025 00:00:00").getTime();
         let countdownInterval;
 
@@ -694,10 +604,12 @@
 
         function skipCountdown() {
             clearInterval(countdownInterval);
+            countdownMusic.pause();
+            countdownMusic.currentTime = 0;
             showConfetti();
-            playMainMusic();
         }
 
+        // Confetti effect
         const partyIcons = ['🎉', '🎂', '🥳', '🎈', '🎁'];
         function showConfetti() {
             document.getElementById('countdownSection').style.display = 'none';
@@ -722,22 +634,17 @@
             
             setTimeout(() => {
                 document.getElementById('throwbackSection').style.display = 'none';
-                
-                document.getElementById('slideshowSection').style.display = 'flex';
-
-                preloadMedia(startSlideshow);
+                startSlideshow();
             }, 3000);
         }
 
+        // Slideshow functionality
         let mediaFiles = [];
         let currentSlide = 0;
         let slideElements = [];
 
-        function playMainMusic() {
-            mainMusic.play().catch(e => console.log('Could not play audio:', e));
-        }
-
         function startSlideshow() {
+            // Dynamically build the mediaFiles array
             mediaFiles = [];
             for (let i = 1; i <= 36; i++) {
                 mediaFiles.push(`media/${i}.jpg`);
@@ -745,8 +652,10 @@
             for (let i = 1; i <= 19; i++) {
                 mediaFiles.push(`media/${i}.mp4`);
             }
+
+            document.getElementById('slideshowSection').style.display = 'flex';
             
-            document.querySelector('.loading-message-container').style.display = 'none';
+            mainMusic.play().catch(e => console.log('Could not play audio:', e));
 
             if (mediaFiles.length === 0) {
                 setTimeout(() => {
@@ -756,16 +665,16 @@
             }
             
             const slideContainer = document.getElementById('slideContainer');
-            slideContainer.innerHTML = '';
+            slideContainer.innerHTML = ''; // Clear loading message
 
-            mediaFiles.forEach((filePath) => {
+            mediaFiles.forEach((filePath, index) => {
                 const isVideo = filePath.includes('.mp4');
                 let element;
                 if (isVideo) {
                     element = document.createElement('video');
                     element.src = filePath;
                     element.autoplay = false;
-                    element.muted = true;
+                    element.muted = false; // Video sound enabled
                 } else {
                     element = document.createElement('img');
                     element.src = filePath;
@@ -798,12 +707,12 @@
                     currentElement.pause();
                     currentSlide++;
                     showNextSlide();
-                }, 3000);
+                }, 3000); // 3 seconds for videos
             } else {
                 setTimeout(() => {
                     currentSlide++;
                     showNextSlide();
-                }, 500);
+                }, 500); // 0.5 seconds for photos
             }
         }
 
@@ -834,6 +743,7 @@
             }, 2000);
         }
 
+        // Open present and show full-screen image
         function showPresent() {
             document.getElementById('cakeSection').style.display = 'none';
             document.getElementById('presentSection').style.display = 'flex';
@@ -849,6 +759,7 @@
             audio.play().catch(e => console.log('Could not play audio:', e));
         }
 
+        // Close full-screen pop-up
         document.getElementById('closeBtn').onclick = () => {
             const popup = document.getElementById('fullscreenPopup');
             popup.style.display = 'none';
@@ -859,11 +770,13 @@
             document.getElementById('presentSection').style.display = 'none';
             document.getElementById('loveNoteSection').style.display = 'flex';
 
+            // Auto scroll to the note section
             document.getElementById('loveNoteSection').scrollIntoView({ behavior: 'smooth' });
         }
 
+        // Button actions
         document.getElementById('accept-btn').onclick = () => {
-            const phoneNumber = '62895629471997';
+            const phoneNumber = '62895629471997'; // Indonesia country code + phone number
             const message = encodeURIComponent('I accept your confession! 😉');
             window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
         };
@@ -880,11 +793,12 @@
             updateCountdown();
             countdownInterval = setInterval(updateCountdown, 1000);
             
-            document.addEventListener('click', () => {
-                playMainMusic();
+            document.body.addEventListener('click', () => {
+                countdownMusic.play().catch(e => console.log('Could not play countdown music:', e));
             }, { once: true });
         });
 
+        // Add CSS for present opening animation
         const style = document.createElement('style');
         style.textContent = `
             @keyframes presentOpen {
